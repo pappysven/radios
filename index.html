@@ -100,11 +100,11 @@
   .live .needle { opacity: 1; }
 
   /* Stations */
-  .stations { flex: 1 1 auto; min-height: 0; display: grid; grid-template-rows: repeat(3, 1fr); gap: 12px; }
+  .stations { flex: 1 1 auto; min-height: 0; display: grid; grid-template-rows: repeat(4, 1fr); gap: 10px; }
   .st {
-    position: relative; overflow: hidden; min-height: 112px;
+    position: relative; overflow: hidden; min-height: 92px;
     border: 0; border-radius: 24px; background: var(--surface); color: var(--ink);
-    padding: 16px 20px 16px 26px; text-align: left; cursor: pointer; font-family: inherit;
+    padding: 14px 20px 14px 26px; text-align: left; cursor: pointer; font-family: inherit;
     display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
     box-shadow: 0 0 0 1px var(--line) inset;
     transition: transform .12s ease;
@@ -120,7 +120,7 @@
   .st.on { color: #fff; box-shadow: none; }
   .st.on::after { opacity: 1; }
   .st-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .st-name { font-weight: 800; font-size: clamp(1.9rem, 8.6vw, 2.5rem); line-height: 1; letter-spacing: -.035em; }
+  .st-name { font-weight: 800; font-size: clamp(1.7rem, 7.8vw, 2.3rem); line-height: 1; letter-spacing: -.035em; }
   .st-f { font-weight: 700; font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
   .st.on .st-f { color: rgba(255,255,255,.85); }
   .st-np { display: block; font-size: .92rem; line-height: 1.3; color: var(--muted); }
@@ -135,16 +135,20 @@
   @keyframes b { 0%,100% { height: 25%; } 50% { height: 100%; } }
   .st[data-k="info"]  { --c: var(--blue); }
   .st[data-k="inter"] { --c: var(--coral); }
+  .st[data-k="culture"] { --c: var(--pink); }
   .st[data-k="nova"]  { --c: var(--violet); }
 
   .stop {
-    flex: 0 0 auto; min-height: 56px; border-radius: 20px; cursor: pointer;
-    border: 2px solid var(--line); background: transparent; color: var(--ink);
-    font: 700 1.05rem "Montserrat", system-ui, sans-serif;
-    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    flex: 0 0 auto; min-height: 66px; border-radius: 22px; cursor: pointer; border: 0;
+    background: var(--coral); color: #fff;
+    font: 800 1.2rem "Montserrat", system-ui, sans-serif; letter-spacing: -.01em;
+    display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+    box-shadow: 0 10px 24px -10px rgba(254,106,85,.8);
+    transition: transform .12s ease, background .3s ease, box-shadow .3s ease, color .3s ease;
   }
-  .stop::before { content: ""; width: 12px; height: 12px; border-radius: 3px; background: currentColor; }
-  .stop:disabled { opacity: .35; cursor: default; }
+  .stop::before { content: ""; width: 16px; height: 16px; border-radius: 4px; background: currentColor; }
+  .stop:active { transform: scale(.98); }
+  .stop:disabled { background: var(--surface); color: var(--muted); box-shadow: 0 0 0 1px var(--line) inset; cursor: default; }
   .stop:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
 
   @media (prefers-reduced-motion: reduce) {
@@ -181,6 +185,10 @@
       <span class="st-top"><span class="st-name">France Inter</span><span class="st-f">87,8</span><span class="bars"><i></i><i></i><i></i></span></span>
       <span class="st-np"><b>…</b><span></span></span>
     </button>
+    <button class="st" data-k="culture" data-name="France Culture" data-f="93.5" data-src="https://icecast.radiofrance.fr/franceculture-midfi.mp3">
+      <span class="st-top"><span class="st-name">France Culture</span><span class="st-f">93,5</span><span class="bars"><i></i><i></i><i></i></span></span>
+      <span class="st-np"><b>…</b><span></span></span>
+    </button>
     <button class="st" data-k="nova" data-name="Radio Nova" data-f="101.5" data-src="https://novazz.ice.infomaniak.ch/novazz-128.mp3">
       <span class="st-top"><span class="st-name">Radio Nova</span><span class="st-f">101,5</span><span class="bars"><i></i><i></i><i></i></span></span>
       <span class="st-np"><b>…</b><span></span></span>
@@ -199,7 +207,7 @@
   const cards = [...document.querySelectorAll('.st')];
   const audio = new Audio();
   audio.preload = 'none';
-  const meta = { info: null, inter: null, nova: null };
+  const meta = { info: null, inter: null, culture: null, nova: null };
   let current = null;
 
   // Graduations du cadran
@@ -256,7 +264,7 @@
     return show ? { show: nice(show), sub: track } : { show: track || 'Radio Nova', sub: track ? 'En ce moment sur Nova' : '' };
   }
 
-  const fetchers = { info: () => radioFrance(2), inter: () => radioFrance(1), nova };
+  const fetchers = { info: () => radioFrance(2), inter: () => radioFrance(1), culture: () => radioFrance(5), nova };
 
   function paintCard(k) {
     const c = cards.find(x => x.dataset.k === k), m = meta[k];
