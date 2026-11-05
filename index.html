@@ -265,7 +265,15 @@
     const r = await fetch('https://api.radiofrance.fr/livemeta/pull/' + id, { cache: 'no-store' });
     const d = await r.json();
     const now = Date.now() / 1000;
-    const steps = (d.levels || []).map(L => d.steps[L.items[L.position]]).filter(s => s && s.end > now - 60);
+    // L'index « position » de l'API n'est pas toujours à jour : on choisit l'étape d'après l'heure
+    const pick = arr => {
+      const cur = arr.filter(s => s.start <= now && now < s.end);
+      if (cur.length) return cur.find(s => s.titleConcept) || cur[cur.length - 1];
+      let best = null, gap = Infinity;
+      arr.forEach(s => { const g = s.end <= now ? now - s.end : s.start - now; if (g < gap) { gap = g; best = s; } });
+      return gap < 1200 ? best : null;
+    };
+    const steps = (d.levels || []).map(L => pick(L.items.map(i => d.steps[i]).filter(Boolean))).filter(Boolean);
     if (!steps.length) return null;
     const top = steps[0], last = steps[steps.length - 1];
     const show = top.titleConcept || top.title || '';
