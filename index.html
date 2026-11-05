@@ -80,7 +80,9 @@
   .live .onair::before { animation: pulse 1.4s ease-in-out infinite; }
   @keyframes pulse { 50% { opacity: .25; } }
 
-  .np { margin-top: 12px; min-height: 3.9em; }
+  .np { margin-top: 12px; min-height: 3.9em; display: flex; align-items: center; gap: 14px; }
+  .np-txt { flex: 1 1 auto; min-width: 0; }
+  .np-art { flex: 0 0 auto; width: 84px; height: 84px; border-radius: 14px; object-fit: cover; background: var(--dial-chip); box-shadow: 0 8px 20px -10px rgba(0,0,0,.6); }
   .np-show { margin: 0; font-size: 1.35rem; font-weight: 700; line-height: 1.2; letter-spacing: -.01em;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .np-sub { margin: 6px 0 0; font-size: .98rem; font-weight: 500; color: var(--dial-muted); line-height: 1.35;
@@ -155,6 +157,9 @@
   .stop:disabled { background: var(--surface); color: var(--muted); box-shadow: 0 0 0 1px var(--line) inset; cursor: default; }
   .stop:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
 
+  .st .st-art { position: absolute; z-index: 1; right: 16px; bottom: 12px; width: 48px; height: 48px; border-radius: 10px; object-fit: cover; display: none; box-shadow: 0 4px 12px -6px rgba(0,0,0,.5); }
+  .st.has-art .st-art { display: block; }
+  .st.has-art .st-np { padding-right: 60px; }
   [hidden] { display: none !important; }
   .controls { flex: 0 0 auto; display: flex; gap: 8px; }
   .controls .stop { flex: 1 1 auto; }
@@ -183,8 +188,11 @@
       <span class="onair" id="onair">Hors antenne</span>
     </div>
     <div class="np" aria-live="polite">
-      <p class="np-show" id="npShow">Choisis une station</p>
-      <p class="np-sub" id="npSub">Touche une radio pour l’écouter.</p>
+      <img class="np-art" id="npArt" alt="" hidden>
+      <div class="np-txt">
+        <p class="np-show" id="npShow">Choisis une station</p>
+        <p class="np-sub" id="npSub">Touche une radio pour l’écouter.</p>
+      </div>
     </div>
     <div class="scale" id="scale">
       <div class="ticks" id="ticks"></div>
@@ -197,22 +205,27 @@
     <button class="st" data-k="info" data-name="France Info" data-f="105.5" data-src="https://icecast.radiofrance.fr/franceinfo-midfi.mp3">
       <span class="st-top"><span class="st-name">France Info</span><span class="st-f">105,5</span><span class="bars"><i></i><i></i><i></i></span></span>
       <span class="st-np"><b>…</b><span></span></span>
+      <img class="st-art" alt="">
     </button>
     <button class="st" data-k="inter" data-name="France Inter" data-f="87.8" data-src="https://icecast.radiofrance.fr/franceinter-midfi.mp3">
       <span class="st-top"><span class="st-name">France Inter</span><span class="st-f">87,8</span><span class="bars"><i></i><i></i><i></i></span></span>
       <span class="st-np"><b>…</b><span></span></span>
+      <img class="st-art" alt="">
     </button>
     <button class="st" data-k="culture" data-name="France Culture" data-f="93.5" data-src="https://icecast.radiofrance.fr/franceculture-midfi.mp3">
       <span class="st-top"><span class="st-name">France Culture</span><span class="st-f">93,5</span><span class="bars"><i></i><i></i><i></i></span></span>
       <span class="st-np"><b>…</b><span></span></span>
+      <img class="st-art" alt="">
     </button>
     <button class="st" data-k="fip" data-name="FIP" data-f="105.1" data-src="https://icecast.radiofrance.fr/fip-midfi.mp3">
       <span class="st-top"><span class="st-name">FIP</span><span class="st-f">105,1</span><span class="bars"><i></i><i></i><i></i></span></span>
       <span class="st-np"><b>…</b><span></span></span>
+      <img class="st-art" alt="">
     </button>
     <button class="st" data-k="nova" data-name="Radio Nova" data-f="101.5" data-src="https://novazz.ice.infomaniak.ch/novazz-128.mp3">
       <span class="st-top"><span class="st-name">Radio Nova</span><span class="st-f">101,5</span><span class="bars"><i></i><i></i><i></i></span></span>
       <span class="st-np"><b>…</b><span></span></span>
+      <img class="st-art" alt="">
     </button>
   </div>
 
@@ -229,7 +242,7 @@
   const MIN = 87.5, MAX = 108;
   const pos = f => ((f - MIN) / (MAX - MIN)) * 100;
   const $ = id => document.getElementById(id);
-  const app = $('app'), freq = $('freq'), onair = $('onair'), npShow = $('npShow'), npSub = $('npSub'),
+  const app = $('app'), freq = $('freq'), onair = $('onair'), npShow = $('npShow'), npSub = $('npSub'), npArt = $('npArt'),
         stopBtn = $('stop'), needle = $('needle');
   const cards = [...document.querySelectorAll('.st')];
   const audio = $('player');
@@ -287,7 +300,9 @@
       sub = top.title;
     }
     if (sub && show && sub.toLowerCase().startsWith(show.toLowerCase())) sub = '';
-    return { show: nice(show), sub: nice(sub) };
+    const vis = [last, top].map(x => x.visual).find(Boolean);
+    const art = !vis ? '' : /^https?:/.test(vis) ? vis : 'https://www.radiofrance.fr/pikapi/images/' + vis + '/400x400';
+    return { show: nice(show), sub: nice(sub), art };
   }
 
   async function nova() {
@@ -298,7 +313,8 @@
     const show = e.currentShow ? (e.currentShow.title || e.currentShow.name || '') : '';
     const t = e.currentTrack;
     const track = t ? nice(t.artist) + ' – ' + nice(t.title) : '';
-    return show ? { show: nice(show), sub: track } : { show: track || 'Radio Nova', sub: track ? 'En ce moment sur Nova' : '' };
+    const art = t ? (t.media_url || t.image || '') : '';
+    return show ? { show: nice(show), sub: track, art } : { show: track || 'Radio Nova', sub: track ? 'En ce moment sur Nova' : '', art };
   }
 
   const fetchers = { info: () => radioFrance(2), inter: () => radioFrance(1), culture: () => radioFrance(5), fip: () => radioFrance(7), nova };
@@ -308,19 +324,25 @@
     const b = c.querySelector('.st-np b'), s = c.querySelector('.st-np span');
     b.textContent = m ? m.show : 'Programme indisponible';
     s.textContent = m && m.sub ? m.sub : '';
+    const img = c.querySelector('.st-art');
+    if (m && m.art) { if (img.getAttribute('src') !== m.art) img.src = m.art; c.classList.add('has-art'); }
+    else { c.classList.remove('has-art'); img.removeAttribute('src'); }
   }
+  cards.forEach(c => c.querySelector('.st-art').addEventListener('error', () => c.classList.remove('has-art')));
+  npArt.addEventListener('error', () => { npArt.hidden = true; });
 
   function paintDial() {
     if (!current) return;
     const m = meta[current.dataset.k];
     npShow.textContent = m ? m.show : current.dataset.name;
     npSub.textContent = m && m.sub ? m.sub : 'En direct';
+    if (m && m.art) { if (npArt.getAttribute('src') !== m.art) npArt.src = m.art; npArt.hidden = false; } else npArt.hidden = true;
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: m ? (m.sub || m.show) : current.dataset.name,
         artist: m && m.sub ? m.show : current.dataset.name,
         album: current.dataset.name,
-        artwork: [{ src: 'apple-touch-icon.png', sizes: '180x180', type: 'image/png' }]
+        artwork: m && m.art ? [{ src: m.art, sizes: '400x400' }] : [{ src: 'apple-touch-icon.png', sizes: '180x180', type: 'image/png' }]
       });
     }
   }
@@ -353,6 +375,7 @@
       onair.textContent = 'Hors antenne';
       npShow.textContent = 'Choisis une station';
       npSub.textContent = 'Touche une radio pour l’écouter.';
+      npArt.hidden = true;
     }
   }
 
@@ -431,7 +454,7 @@
     const md = new chrome.cast.media.MusicTrackMediaMetadata(), m = meta[c.dataset.k];
     md.title = m ? (m.sub || m.show) : c.dataset.name;
     md.artist = c.dataset.name;
-    md.images = [new chrome.cast.Image(new URL('apple-touch-icon.png', location.href).href)];
+    md.images = [new chrome.cast.Image(m && m.art ? m.art : new URL('apple-touch-icon.png', location.href).href)];
     mi.metadata = md;
     onair.textContent = 'Connexion…';
     s.loadMedia(new chrome.cast.media.LoadRequest(mi)).then(
