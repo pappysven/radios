@@ -63,7 +63,7 @@
   .readout { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
   .freq {
     font-weight: 800; font-size: clamp(3.2rem, 15vw, 4.2rem); line-height: .9;
-    letter-spacing: -.04em; font-variant-numeric: tabular-nums; color: #3b4260;
+    letter-spacing: -.04em; font-variant-numeric: tabular-nums; color: #3b4260; white-space: nowrap;
     transition: color .4s ease;
   }
   .live .freq { color: transparent; background: var(--grad); -webkit-background-clip: text; background-clip: text; }
@@ -100,7 +100,7 @@
   .live .needle { opacity: 1; }
 
   /* Stations */
-  .stations { flex: 1 1 auto; min-height: 0; display: grid; grid-template-rows: repeat(5, 1fr); gap: 8px; }
+  .stations { flex: 1 0 auto; display: grid; grid-template-rows: repeat(5, minmax(min-content, 1fr)); gap: 8px; }
   .st {
     position: relative; overflow: hidden; min-height: 80px;
     border: 0; border-radius: 24px; background: var(--surface); color: var(--ink);
@@ -123,7 +123,7 @@
   .st-name { font-weight: 800; font-size: clamp(1.55rem, 7.2vw, 2.1rem); line-height: 1; letter-spacing: -.035em; }
   .st-f { font-weight: 700; font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
   .st.on .st-f { color: rgba(255,255,255,.85); }
-  .st-np { display: block; font-size: .88rem; line-height: 1.3; color: var(--muted); }
+  .st-np { display: block; font-size: .88rem; line-height: 1.35; padding-bottom: 2px; color: var(--muted); }
   .st-np b { display: block; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .st-np span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .st.on .st-np, .st.on .st-np b { color: #fff; }
@@ -163,7 +163,7 @@
 <main class="app" id="app">
   <section class="dial" aria-label="Cadran">
     <div class="readout">
-      <div class="freq" id="freq">——,—<small>MHz</small></div>
+      <div class="freq" id="freq">FM</div>
       <span class="onair" id="onair">Hors antenne</span>
     </div>
     <div class="np" aria-live="polite">
@@ -255,6 +255,7 @@
     } else if (top.titleConcept && top.title && top.title !== top.titleConcept) {
       sub = top.title;
     }
+    if (sub && show && sub.toLowerCase().startsWith(show.toLowerCase())) sub = '';
     return { show: nice(show), sub: nice(sub) };
   }
 
@@ -316,7 +317,7 @@
       paintDial();
     } else {
       needle.style.left = '50%';
-      freq.innerHTML = '——,—<small>MHz</small>';
+      freq.innerHTML = 'FM';
       onair.textContent = 'Hors antenne';
       npShow.textContent = 'Choisis une station';
       npSub.textContent = 'Touche une radio pour l’écouter.';
