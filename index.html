@@ -276,7 +276,9 @@
     const steps = (d.levels || []).map(L => pick(L.items.map(i => d.steps[i]).filter(Boolean))).filter(Boolean);
     if (!steps.length) return null;
     const top = steps[0], last = steps[steps.length - 1];
-    const show = top.titleConcept || top.title || '';
+    let show = top.titleConcept || top.title || '';
+    const artist = typeof top.authors === 'string' && top.authors ? top.authors : (typeof top.performers === 'string' ? top.performers : '');
+    if (last === top && !top.titleConcept && artist) show = artist + ' – ' + top.title;
     let sub = '';
     if (last !== top) {
       const who = typeof last.authors === 'string' && last.authors ? last.authors : (typeof last.performers === 'string' && last.performers ? last.performers : '');
