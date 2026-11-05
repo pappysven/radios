@@ -17,7 +17,7 @@
 <style>
   :root {
     --navy: #1e2334; --deep: #141826;
-    --blue: #415eff; --violet: #cb45fe; --coral: #fe6a55; --pink: #f8549e;
+    --blue: #415eff; --violet: #cb45fe; --coral: #fe6a55; --pink: #f8549e; --teal: #2fd3b0;
     --grad: linear-gradient(120deg, var(--blue) 0%, var(--violet) 55%, var(--coral) 100%);
     --bg: #eef0f6; --surface: #ffffff; --line: #d9dce8; --ink: #1e2334; --muted: #646b84;
     color-scheme: light;
@@ -43,14 +43,14 @@
     -webkit-tap-highlight-color: transparent;
   }
   .app {
-    height: 100%; max-width: 560px; margin: 0 auto;
-    display: flex; flex-direction: column; gap: 12px; padding: 12px 14px 14px;
+    min-height: 100%; max-width: 560px; margin: 0 auto;
+    display: flex; flex-direction: column; gap: 10px; padding: 10px 14px 12px;
   }
 
   /* Cadran */
   .dial {
     flex: 0 0 auto; position: relative; overflow: hidden;
-    background: var(--deep); color: #fff; border-radius: 26px; padding: 20px 20px 16px;
+    background: var(--deep); color: #fff; border-radius: 26px; padding: 18px 20px 14px;
   }
   .dial::before {
     content: ""; position: absolute; inset: 0; pointer-events: none;
@@ -77,13 +77,13 @@
   .live .onair::before { animation: pulse 1.4s ease-in-out infinite; }
   @keyframes pulse { 50% { opacity: .25; } }
 
-  .np { margin-top: 16px; min-height: 4.4em; }
+  .np { margin-top: 12px; min-height: 3.9em; }
   .np-show { margin: 0; font-size: 1.35rem; font-weight: 700; line-height: 1.2; letter-spacing: -.01em;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .np-sub { margin: 6px 0 0; font-size: .98rem; font-weight: 500; color: #b4bad1; line-height: 1.35;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-  .scale { position: relative; height: 50px; margin-top: 14px; }
+  .scale { position: relative; height: 46px; margin-top: 10px; }
   .ticks { position: absolute; top: 0; bottom: 18px; display: flex; justify-content: space-between; align-items: flex-end; }
   .ticks i { width: 1px; height: 7px; background: #3b4260; }
   .ticks i.major { height: 15px; background: #6d7494; }
@@ -100,12 +100,12 @@
   .live .needle { opacity: 1; }
 
   /* Stations */
-  .stations { flex: 1 1 auto; min-height: 0; display: grid; grid-template-rows: repeat(4, 1fr); gap: 10px; }
+  .stations { flex: 1 1 auto; min-height: 0; display: grid; grid-template-rows: repeat(5, 1fr); gap: 8px; }
   .st {
-    position: relative; overflow: hidden; min-height: 92px;
+    position: relative; overflow: hidden; min-height: 80px;
     border: 0; border-radius: 24px; background: var(--surface); color: var(--ink);
-    padding: 14px 20px 14px 26px; text-align: left; cursor: pointer; font-family: inherit;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
+    padding: 10px 18px 10px 24px; text-align: left; cursor: pointer; font-family: inherit;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 6px;
     box-shadow: 0 0 0 1px var(--line) inset;
     transition: transform .12s ease;
   }
@@ -120,10 +120,10 @@
   .st.on { color: #fff; box-shadow: none; }
   .st.on::after { opacity: 1; }
   .st-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .st-name { font-weight: 800; font-size: clamp(1.7rem, 7.8vw, 2.3rem); line-height: 1; letter-spacing: -.035em; }
+  .st-name { font-weight: 800; font-size: clamp(1.55rem, 7.2vw, 2.1rem); line-height: 1; letter-spacing: -.035em; }
   .st-f { font-weight: 700; font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
   .st.on .st-f { color: rgba(255,255,255,.85); }
-  .st-np { display: block; font-size: .92rem; line-height: 1.3; color: var(--muted); }
+  .st-np { display: block; font-size: .88rem; line-height: 1.3; color: var(--muted); }
   .st-np b { display: block; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .st-np span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .st.on .st-np, .st.on .st-np b { color: #fff; }
@@ -136,10 +136,11 @@
   .st[data-k="info"]  { --c: var(--blue); }
   .st[data-k="inter"] { --c: var(--coral); }
   .st[data-k="culture"] { --c: var(--pink); }
+  .st[data-k="fip"] { --c: var(--teal); }
   .st[data-k="nova"]  { --c: var(--violet); }
 
   .stop {
-    flex: 0 0 auto; min-height: 66px; border-radius: 22px; cursor: pointer; border: 0;
+    flex: 0 0 auto; min-height: 62px; border-radius: 22px; cursor: pointer; border: 0;
     background: var(--coral); color: #fff;
     font: 800 1.2rem "Montserrat", system-ui, sans-serif; letter-spacing: -.01em;
     display: inline-flex; align-items: center; justify-content: center; gap: 12px;
@@ -189,6 +190,10 @@
       <span class="st-top"><span class="st-name">France Culture</span><span class="st-f">93,5</span><span class="bars"><i></i><i></i><i></i></span></span>
       <span class="st-np"><b>…</b><span></span></span>
     </button>
+    <button class="st" data-k="fip" data-name="FIP" data-f="105.1" data-src="https://icecast.radiofrance.fr/fip-midfi.mp3">
+      <span class="st-top"><span class="st-name">FIP</span><span class="st-f">105,1</span><span class="bars"><i></i><i></i><i></i></span></span>
+      <span class="st-np"><b>…</b><span></span></span>
+    </button>
     <button class="st" data-k="nova" data-name="Radio Nova" data-f="101.5" data-src="https://novazz.ice.infomaniak.ch/novazz-128.mp3">
       <span class="st-top"><span class="st-name">Radio Nova</span><span class="st-f">101,5</span><span class="bars"><i></i><i></i><i></i></span></span>
       <span class="st-np"><b>…</b><span></span></span>
@@ -207,7 +212,7 @@
   const cards = [...document.querySelectorAll('.st')];
   const audio = new Audio();
   audio.preload = 'none';
-  const meta = { info: null, inter: null, culture: null, nova: null };
+  const meta = { info: null, inter: null, culture: null, fip: null, nova: null };
   let current = null;
 
   // Graduations du cadran
@@ -264,7 +269,7 @@
     return show ? { show: nice(show), sub: track } : { show: track || 'Radio Nova', sub: track ? 'En ce moment sur Nova' : '' };
   }
 
-  const fetchers = { info: () => radioFrance(2), inter: () => radioFrance(1), culture: () => radioFrance(5), nova };
+  const fetchers = { info: () => radioFrance(2), inter: () => radioFrance(1), culture: () => radioFrance(5), fip: () => radioFrance(7), nova };
 
   function paintCard(k) {
     const c = cards.find(x => x.dataset.k === k), m = meta[k];
